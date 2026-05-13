@@ -1,2 +1,2 @@
-# Opt4AI-_Hybrid_PSO-GA
+# Opt4AI_Hybrid_PSO-GA
 Hybrid PSO-GA algorithm
