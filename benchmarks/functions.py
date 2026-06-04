@@ -22,7 +22,7 @@ class Ackley:
     maximize = False
     n_continuous = 3
     discrete_options = [] # No discrete dimensions
-    cont_lb      = np.array([-5.0] * 3)
+    cont_lb      = np.array([-5.0] * 3) # 3 dimensions, each in [-5, 5]
     cont_ub      = np.array([ 5.0] * 3)
     optimum      = 0.0
 
@@ -77,6 +77,7 @@ class Knapsack:
 
 
 # MIXED BENCHMARK - Neural Architecture Search (NAS) problem 
+# Both x_cont and x_disc matter and interact
 
 class NAS:
     """
