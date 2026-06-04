@@ -1,0 +1,107 @@
+"""
+    Update operators:
+         - pso_update: updates the velocity and position of a particle in the continuous space using the PSO formula.
+         - ga_update: evolves the discrete dimensions using crossover + mutation
+"""
+
+import numpy as np
+from core.particle import HybridParticle
+
+
+
+
+
+def pso_update(
+       particle: HybridParticle, # Particle to update
+       global_best_cont: np.ndarray, # Global best position in the continuous space
+       w: float = 0.7, # Inertia weight
+       c1: float = 1.5, # Cognitive coefficient
+       c2: float = 1.5  # Social coefficient
+) -> None:
+    """ 
+        Standard PSO velocity + position update on the continuous part only 
+        
+        v ← w·v + c1·r1·(pb - x) + c2·r2·(gb - x)
+        x ← x + v
+    """
+    n = len(particle.x_cont)
+    if n == 0:
+        return  # No continuous dimensions to update - Pure discrete problem
+    r1 = np.random.random(n)
+    r2 = np.random.random(n)
+
+    particle.v_cont = w * particle.v_cont + c1 * r1 * (particle.pb_cont - particle.x_cont) + c2 * r2 * (global_best_cont - particle.x_cont)
+    particle.x_cont = particle.x_cont + particle.v_cont
+
+    lb, ub = particle.cont_lb, particle.cont_ub
+    # Producing boolean arrays to identify which particles have violated the bounds
+    hit_lower_bound = particle.x_cont < lb
+    hit_upper_bound = particle.x_cont > ub
+    particle.x_cont = np.clip(particle.x_cont, lb, ub) # Forcing every element of x_cont to be within the bounds [lb, ub]
+    particle.v_cont[hit_lower_bound | hit_upper_bound] *= 0.5 # Combining two boolean arrays with OR to identify which particles have violated either the lower or upper bound, 
+    # and halving the velocity of those particles to reduce the chance of future violations
+
+
+
+
+
+
+
+
+
+
+
+
+def ga_update(
+        particle: HybridParticle, # Particle to update
+        partner: HybridParticle, # Partner particle for crossover
+        p_crossover: float = 0.7, # Crossover probability
+        p_mutation: float = 0.1, # Mutation probability
+) -> None:
+    """
+        Uniform crossover + mutation for the discrete dimensions only. 
+        Crossover is performed with a randomly selected partner particle
+        Mutation is applied with a certain probability to introduce diversity.
+    """
+
+    n = len(particle.x_disc)
+    if n == 0:
+        return  # No discrete dimensions to update - Pure continuous problem
+    child = particle.x_disc.copy()
+
+    # Uniform crossover
+    if np.random.rand() < p_crossover:
+        mask = np.random.rand(n) < 0.5
+        child[mask] = partner.x_disc[mask]
+
+    # Mutation
+    for i in range(n):
+        if np.random.rand() < p_mutation:
+            # Randomly select a new value for this discrete dimension
+            child[i] = np.random.randint(0, particle.discrete_options[i])
+
+    particle.x_disc = child
+
+
+
+
+
+
+
+
+
+
+
+
+
+def tournament_selection(
+        population: list[HybridParticle], # List of particles in the current population
+        k: int = 3 # Number of particles to compete in each tournament
+) -> HybridParticle:
+    """
+        Tournament selection: Taking k random particles, return the fittest
+        Used to pick GA crossover partner
+    """
+
+    candidates = np.random.choice(population, size=k, replace=False)
+    return max(candidates, key=lambda p: p.fitness)
