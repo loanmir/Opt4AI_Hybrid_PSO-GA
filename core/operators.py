@@ -92,8 +92,6 @@ def ga_update(
 
 
 
-
-
 def tournament_selection(
         population: list[HybridParticle], # List of particles in the current population
         k: int = 3 # Number of particles to compete in each tournament
