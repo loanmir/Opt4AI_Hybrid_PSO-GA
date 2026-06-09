@@ -59,7 +59,7 @@ class Knapsack:
     problem_type = "discrete"
     maximize = True
     n_continuous = 0
-    discrete_options = [0, 1] * len(WEIGHTS) # Binary decisions for each item
+    discrete_options = [2] * len(WEIGHTS) # Binary decisions for each item
     cont_lb = np.array([]) # No continuous dimensions
     cont_ub = np.array([]) # No continuous dimensions
     optimum = 18.8 

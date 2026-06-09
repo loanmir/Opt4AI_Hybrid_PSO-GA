@@ -93,14 +93,14 @@ def run_all_algorithms(
             t0 = time.perf_counter()
             result: AlgorithmResult = runner()
             times.append(time.perf_counter() - t0)
-            bests.append(result.best_fit)
+            bests.append(result.best_fitness)
             histories.append(result.history)
             # Track which run produced the best solution
             if best_result is None:
                 best_result = result
-            elif maximize and result.best_fit > best_result.best_fit:
+            elif maximize and result.best_fitness > best_result.best_fitness:
                 best_result = result
-            elif not maximize and result.best_fit < best_result.best_fit:
+            elif not maximize and result.best_fitness < best_result.best_fitness:
                 best_result = result
 
         summaries[algo_name] = MultiRunSummary(
@@ -113,8 +113,8 @@ def run_all_algorithms(
             mean_time_sec=float(np.mean(times)),
             histories=histories,
             maximize=maximize,
-            best_x_cont=best_result.best_cont,
-            best_x_disc=best_result.best_disc,
+            best_x_cont=best_result.best_continuous,
+            best_x_disc=best_result.best_discrete,
         )
         if verbose:
             s = summaries[algo_name]
@@ -163,7 +163,7 @@ def sweep_ga_every(
                 max_iters=max_iters,
                 ga_every=gae,
             )
-            bests.append(r.best_fit)
+            bests.append(r.best_fitness)
         results[gae] = bests
         if verbose:
             print(f"  mean={np.mean(bests):.4f}")
@@ -370,5 +370,5 @@ def save_results_txt(
 
     out = Path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(buf.getvalue())
+    out.write_text(buf.getvalue(), encoding="utf-8")
     print(f"  Saved → {out}")
