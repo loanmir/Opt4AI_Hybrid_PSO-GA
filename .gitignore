@@ -1,1 +1,8 @@
 .venv/
+results/
+
+# Python cache files — never commit these
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
