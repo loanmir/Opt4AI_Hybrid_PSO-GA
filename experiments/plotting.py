@@ -43,7 +43,7 @@ def save_or_show(fig: plt.Figure, path: Path | None) -> None:
 
 
 
-
+    """
 
 # Convergence curves for one benchmark, 3 algorithms 
 def plot_convergence(
@@ -52,10 +52,10 @@ def plot_convergence(
         runs: int = 1, # number of runs used to produce the results
         output_path: Path | None = None # If given then plot stored there, else just shown interactively
 ) -> None:
-    """
+    
         Plotting converges curves (best fitness vs iteration) for one benchmark.
         If runs > 1, it will plot the mean curve with shaded area representing std deviation across runs.
-    """
+    
 
     fig, ax = plt.subplots(figsize=(8, 4.5))
     
@@ -75,6 +75,7 @@ def plot_convergence(
     fig.tight_layout()
     save_or_show(fig, output_path)
 
+    """
 
 
 
