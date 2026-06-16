@@ -1,5 +1,6 @@
 .venv/
 results/
+resultsHard/
 
 # Python cache files — never commit these
 __pycache__/
