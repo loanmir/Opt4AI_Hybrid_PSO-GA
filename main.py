@@ -4,9 +4,9 @@ Entry point for the Hybrid PSO-GA project
 Usage
 -------
 
-    python main.py 
-    python main.py --quick
-    python main.py --no-save
+    python main.py              Full experiment: 10 runs, 200 iterations
+    python main.py --quick      Quick experiment: 3 runs, 100 iterations
+    python main.py --no-save    Show plots interactively instead of saving to disk
 
 
 
@@ -106,7 +106,7 @@ def main():
 
     n_runs    = 3   if args.quick else 10
     max_iters = 100 if args.quick else 200
-    base_dir  = None if args.no_save else Path("results")
+    base_dir  = None if args.no_save else Path("resultsHard")
 
     # Decide which suites to run
     if base_dir:

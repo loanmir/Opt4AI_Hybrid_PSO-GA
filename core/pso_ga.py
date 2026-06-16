@@ -77,7 +77,7 @@ def run_hybrid(
         c2: float = 1.5,
         p_cross: float = 0.7,
         p_mut: float = 0.1,
-        ga_every: int = 3, # -> GA xover and mutation on discrete dims EVERY N ITERS
+        ga_every: int = 1, # -> GA xover and mutation on discrete dims EVERY N ITERS
         w_decay: bool = True, # -> INERTIA WEIGHT DECAY -> Discreases linearly the w value -> It balances exploration early and exploitation late in the run
         maximize: bool = False
 ) -> AlgorithmResult: 
@@ -118,7 +118,8 @@ def run_hybrid(
             if iter % ga_every == 0:
                 # Select a partner for crossover using tournament selection
                 partner = tournament_selection(pop, k=3)
-                ga_update(particle, partner, p_cross, p_mut)
+                ga_update(particle, partner, fitner_fn, p_cross, p_mut, maximize=maximize)
+                #ga_update(particle, partner, p_cross, p_mut, maximize=maximize)
 
             # Fitness evaluation
             particle.fitness = fitner_fn(particle.x_cont, particle.x_disc)

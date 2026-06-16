@@ -55,13 +55,17 @@ def pso_update(
 def ga_update(
         particle: HybridParticle, # Particle to update
         partner: HybridParticle, # Partner particle for crossover
+        fitness_fn, # Fitness function to evaluate the new candidate solution
         p_crossover: float = 0.7, # Crossover probability
         p_mutation: float = 0.1, # Mutation probability
+        maximize: bool = False # Whether we are maximizing or minimizing the fitness
 ) -> None:
     """
         Uniform crossover + mutation for the discrete dimensions only. 
         Crossover is performed with a randomly selected partner particle
         Mutation is applied with a certain probability to introduce diversity.
+
+        GREEDYNESS: The new candidate solution is accepted if it has better fitness than the current particle (for maximization) or worse fitness (for minimization).
     """
 
     n = len(particle.x_disc)
@@ -79,9 +83,24 @@ def ga_update(
         if np.random.rand() < p_mutation:
             # Randomly select a new value for this discrete dimension
             child[i] = np.random.randint(0, particle.discrete_options[i])
+    
+    # If nothing actually changed, there's nothing to evaluate or compare
+    if np.array_equal(child, particle.x_disc):
+        return
 
-    particle.x_disc = child
+    # --- Greedy acceptance check ---
+    candidate_fit = fitness_fn(particle.x_cont, child)
+    is_better_or_equal = (
+        candidate_fit >= particle.fitness if maximize
+        else candidate_fit <= particle.fitness
+    )
 
+    if is_better_or_equal:
+        particle.x_disc = child
+        particle.fitness = candidate_fit
+    # else: discard the candidate, keep particle.x_disc unchanged
+    
+    #particle.x_disc = child
 
 
 
