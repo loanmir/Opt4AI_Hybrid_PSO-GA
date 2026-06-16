@@ -1,1 +1,1 @@
-from .functions import BENCHMARKS, HardAckley, HardKnapsack, NAS, HardNAS
+from .functions import BENCHMARKS, HardAckley, HardKnapsack, HardNAS
