@@ -1,6 +1,11 @@
 .venv/
 results/
 resultsHard/
+resultsEasy/
+results_if_worse_not_discarded/
+resultsHard_if_worse_not_discarded/
+results_if_worse_discarded/
+resultsHard_if_worse_discarded/
 
 # Python cache files — never commit these
 __pycache__/
