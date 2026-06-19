@@ -114,16 +114,21 @@ def run_hybrid(
             # PSO update for continuous dimensions
             pso_update(particle, global_best.x_cont, w_current, c1, c2)
 
+            # Fitness evaluation
+            # Fix: Evaluation of fitness immediately after the PSO step, so that GA has an accurate baseline to compare.
+            # If evaluation is done after GA, it might be comparing against an outdated fitness value, leading to incorrect acceptance/rejection of new solutions.
+            particle.fitness = fitner_fn(particle.x_cont, particle.x_disc)     # -> Doing a double fitness evaluation 
+            n_evals += 1
+
             # GA update for discrete dimensions every 'ga_every' iterations
             if iter % ga_every == 0:
                 # Select a partner for crossover using tournament selection
                 partner = tournament_selection(pop, k=3)
-                ga_update(particle, partner, fitner_fn, p_cross, p_mut, maximize=maximize)    # making the fitness evaluation inside the ga_update function also
+
+                ga_update(particle, partner, fitner_fn, p_cross, p_mut, maximize=maximize) # making the fitness evaluation inside the ga_update function also
                 #ga_update(particle, partner, p_cross, p_mut, maximize=maximize)
 
-            # Fitness evaluation
-            particle.fitness = fitner_fn(particle.x_cont, particle.x_disc)     # -> Doing a double fitness evaluation 
-            n_evals += 1
+            
 
             # Updating personal best and global best
             particle.update_personal_best(maximize=maximize)
@@ -278,7 +283,7 @@ def run_pure_ga(
             # Continuous arithmetic -> Arithmetic crossover + Gaussian mutation
             if n_continuous > 0:
                 alpha = np.random.rand(n_continuous)
-                child_cont = alpha * particle.x_cont + (1 - alpha) * partner.x_cont
+                child_cont = alpha * particle.x_cont + (1 - alpha) * partner.x_cont # Arithmetic crossover
                 if np.random.rand() < p_mut:
                     child_cont += np.random.randn(n_continuous) * sigma # Gaussian mutation
                 child_cont = np.clip(child_cont, cont_lb, cont_ub) # Ensure continuous values stay within bounds

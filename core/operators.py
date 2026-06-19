@@ -16,10 +16,12 @@ def pso_update(
        global_best_cont: np.ndarray, # Global best position in the continuous space
        w: float = 0.7, # Inertia weight
        c1: float = 1.5, # Cognitive coefficient
-       c2: float = 1.5  # Social coefficient
+       c2: float = 1.5,  # Social coefficient
+       v_clamp_factor: float = 0.2 # Clamping factor for velocity to prevent overshooting
 ) -> None:
     """ 
         Standard PSO velocity + position update on the continuous part only 
+        Velocity Clamping: To prevent particles from moving too fast and potentially overshooting good solutions, we can clamp the velocity to a certain range.
         
         v ← w·v + c1·r1·(pb - x) + c2·r2·(gb - x)
         x ← x + v
@@ -31,9 +33,19 @@ def pso_update(
     r2 = np.random.random(n)
 
     particle.v_cont = w * particle.v_cont + c1 * r1 * (particle.pb_cont - particle.x_cont) + c2 * r2 * (global_best_cont - particle.x_cont)
+    
+    # Velocity Clamping
+    # In landscapes with steep penalties, PSO particles accelerate rapidly towards the global best, which can lead to overshooting and divergence. 
+    # By clamping the velocity, we can prevent particles from moving too fast and potentially overshooting good solutions and go past them.
+    # Actually imposing a strict speed limit in order for the particles to take smaller and controlled steps.
+    lb, ub = particle.cont_lb, particle.cont_ub
+    v_max = (ub - lb) * v_clamp_factor
+    particle.v_cont = np.clip(particle.v_cont, -v_max, v_max)
+
+    # Update position
     particle.x_cont = particle.x_cont + particle.v_cont
 
-    lb, ub = particle.cont_lb, particle.cont_ub
+    
     # Producing boolean arrays to identify which particles have violated the bounds
     hit_lower_bound = particle.x_cont < lb
     hit_upper_bound = particle.x_cont > ub
