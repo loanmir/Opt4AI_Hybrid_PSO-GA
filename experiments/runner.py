@@ -280,7 +280,7 @@ def print_best_solutions(all_summaries: dict[str, dict[str, MultiRunSummary]],
 def save_results_txt(
     all_summaries: dict[str, dict[str, MultiRunSummary]],
     benchmarks_list: list,
-    path: str = "resultsHard/results.txt",
+    path: str = "resultsEasy/results.txt",
 ) -> None:
     """
     Save the full results — fitness table + best solution vectors — to a

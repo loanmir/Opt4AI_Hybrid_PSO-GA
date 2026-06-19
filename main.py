@@ -14,9 +14,9 @@ Output
 -------
 
 
-    The results of the optimization process will be saved in the 'results' directory.
-    results/convergence_<benchmark_name>.png --> Convergence per benchmark
-    results/summary_table.png                --> Heatmap for each bechmark and algorithm combination
+    The results of the optimization process will be saved in the 'resultsEasy/resultsHard' directory.
+    resultsEasy(resultsHard)/convergence_<benchmark_name>.png --> Convergence per benchmark
+    resultsEasy(resultsHard)/summary_table.png                --> Heatmap for each bechmark and algorithm combination
     ...
 """
 
@@ -106,7 +106,7 @@ def main():
 
     n_runs    = 3   if args.quick else 10
     max_iters = 100 if args.quick else 200
-    base_dir  = None if args.no_save else Path("resultsHard")
+    base_dir  = None if args.no_save else Path("resultsEasy")
 
     # Decide which suites to run
     if base_dir:

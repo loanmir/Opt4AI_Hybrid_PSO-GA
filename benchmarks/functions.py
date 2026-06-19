@@ -287,4 +287,4 @@ class HardNAS:
 
 
     
-BENCHMARKS = [HardAckley(), HardKnapsack(), HardNAS()]
+BENCHMARKS = [Ackley(), Knapsack(), NAS()]
