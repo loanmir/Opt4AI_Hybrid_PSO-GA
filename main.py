@@ -116,8 +116,8 @@ def main():
 
     mode = "quick" if args.quick else "full"
     print(f"\n{'='*62}")
-    print(f"  Hybrid PSO-GA  —  {mode} experiment")
-    print(f"  {n_runs} runs × {max_iters} iters × 3 algorithms × 3 benchmarks")
+    print(f"Hybrid PSO-GA  —  {mode} experiment")
+    print(f"{n_runs} runs × {max_iters} iters × 3 algorithms × 3 benchmarks")
     print(f"{'='*62}\n")
 
 
@@ -160,7 +160,7 @@ def main():
         save_results_txt(all_summaries, BENCHMARKS, path=str(base_dir / "results.txt"))
 
     if base_dir:
-        print(f"\nDone.  All plots and results saved to ./{base_dir}/")
+        print(f"\nDone. All plots and results saved to ./{base_dir}/")
     else:
         print("\nDone.")
 

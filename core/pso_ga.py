@@ -118,11 +118,11 @@ def run_hybrid(
             if iter % ga_every == 0:
                 # Select a partner for crossover using tournament selection
                 partner = tournament_selection(pop, k=3)
-                ga_update(particle, partner, fitner_fn, p_cross, p_mut, maximize=maximize)
+                ga_update(particle, partner, fitner_fn, p_cross, p_mut, maximize=maximize)    # making the fitness evaluation inside the ga_update function also
                 #ga_update(particle, partner, p_cross, p_mut, maximize=maximize)
 
             # Fitness evaluation
-            particle.fitness = fitner_fn(particle.x_cont, particle.x_disc)
+            particle.fitness = fitner_fn(particle.x_cont, particle.x_disc)     # -> Doing a double fitness evaluation 
             n_evals += 1
 
             # Updating personal best and global best
@@ -303,7 +303,8 @@ def run_pure_ga(
             child.pb_cont = child_cont.copy()
             child.pb_disc = child_disc.copy()
             child.pb_fit = child.fitness
-
+            
+            # Greedy acceptance: keep the better particle (parent or child) based on fitness
             if maximize:
                 new_pop.append(child if child.fitness > particle.fitness else particle)
             else:

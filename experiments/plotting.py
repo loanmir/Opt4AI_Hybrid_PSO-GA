@@ -1,6 +1,6 @@
 """
     Plot helpers used by the experiment runners
-
+    Enhanced with modern, publication-ready design aesthetics.
 """
 
 from __future__ import annotations
@@ -9,14 +9,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from pathlib import Path
+import matplotlib.ticker as ticker
 
 from core.pso_ga import AlgorithmResult
 
-
+# Modern, vibrant color palette with high contrast
 COLORS = {
-    "Hybrid PSO-GA": "#378ADD",
-    "Pure PSO":      "#E24B4A",
-    "Pure GA":       "#1D9E75",
+    "Hybrid PSO-GA": "#2563EB",  # Deep Royal Blue
+    "Pure PSO":      "#DC2626",  # Crimson Red
+    "Pure GA":       "#059669",  # Emerald Green
 }
 
 LINESTYLES = {
@@ -25,12 +26,23 @@ LINESTYLES = {
     "Pure GA":       "-.",
 }
 
+def apply_modern_style(ax: plt.Axes) -> None:
+    """Applies clean, modern chart styling by stripping clutter."""
+    # Remove top and right box lines (spines)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_color("#CBD5E1")
+    ax.spines["bottom"].set_color("#CBD5E1")
+    
+    # Tick adjustments
+    ax.tick_params(colors="#475569", labelsize=9)
+    ax.grid(True, alpha=0.2, linestyle="-", color="#94A3B8")
 
-# Consistent saving/showing logic for all plots
+
 def save_or_show(fig: plt.Figure, path: Path | None) -> None:
     if path is not None:
         path.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(path, dpi=150, bbox_inches="tight")
+        fig.savefig(path, dpi=300, bbox_inches="tight")  # Increased DPI for crisp lines
         print(f"  Saved at {path}")
     else:
         plt.tight_layout()
@@ -38,125 +50,101 @@ def save_or_show(fig: plt.Figure, path: Path | None) -> None:
     plt.close(fig)
 
 
-
-
-
-
-
-    """
-
-# Convergence curves for one benchmark, 3 algorithms 
 def plot_convergence(
-        results: list[AlgorithmResult], # list of AlgorithmResult - one per algorithm
-        benchmark_name: str, # benchmark name used for the title
-        runs: int = 1, # number of runs used to produce the results
-        output_path: Path | None = None # If given then plot stored there, else just shown interactively
+        results: list[AlgorithmResult],
+        benchmark_name: str,
+        runs: int = 1,
+        output_path: Path | None = None
 ) -> None:
+    """Plots clean convergence curves with modern styling."""
+    fig, ax = plt.subplots(figsize=(8.5, 4.5), facecolor="white")
+    ax.set_facecolor("white")
     
-        Plotting converges curves (best fitness vs iteration) for one benchmark.
-        If runs > 1, it will plot the mean curve with shaded area representing std deviation across runs.
-    
-
-    fig, ax = plt.subplots(figsize=(8, 4.5))
+    apply_modern_style(ax)
     
     for result in results:
-        color = COLORS.get(result.name, "grey")
+        color = COLORS.get(result.name, "#64748B")
         ls = LINESTYLES.get(result.name, "-")
         iters = np.arange(len(result.history))
-        ax.plot(iters, result.history, label=result.name, color=color, linestyle=ls, linewidth=1.8)
+        ax.plot(iters, result.history, label=result.name, color=color, linestyle=ls, linewidth=2.2)
 
-    ax.set_xlabel("Iteration", fontsize=11)
-    ax.set_ylabel("Best fitness (lower = better)", fontsize=11)
+    ax.set_xlabel("Iteration", fontsize=10, fontweight="bold", color="#1E293B", labelpad=8)
+    ax.set_ylabel("Best Fitness (lower = better)", fontsize=10, fontweight="bold", color="#1E293B", labelpad=8)
+    
     suffix = "s" if runs > 1 else ""
-    ax.set_title(f"{benchmark_name}  —  convergence  ({runs} run{suffix})", fontsize=12, fontweight="bold")
-    ax.legend(fontsize=10)
-    ax.grid(True, alpha=0.3, linestyle=":")
-    ax.set_yscale("symlog", linthresh=1e-2)   # log scale shows tail behaviour
+    ax.set_title(f"{benchmark_name} Convergence ({runs} Run{suffix})", fontsize=12, fontweight="bold", color="#0F172A", pad=14, loc="left")
+    
+    ax.legend(frameon=True, facecolor="#F8FAFC", edgecolor="none", fontsize=9, loc="upper right")
+    ax.set_yscale("symlog", linthresh=1e-2)
+    
     fig.tight_layout()
     save_or_show(fig, output_path)
-
-    """
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def plot_multi_run_convergence(
-        histories_by_algorithm: dict[str, list[list[float]]], # {algorithm_name: [run1_history, run2_history, ...]}
+        histories_by_algorithm: dict[str, list[list[float]]],
         benchmark_name: str,
         output_path: Path | None = None
 ) -> None:
-    """
-        Plotting mean + standard convergence across multiple independent runs
-    """
-
-    fig, ax = plt.subplots(figsize=(8, 4.5))
+    """Plots clean mean + shaded standard deviation curves with fixed Y-axis scales."""
+    fig, ax = plt.subplots(figsize=(8.5, 4.5), facecolor="white")
+    ax.set_facecolor("white")
+    
+    apply_modern_style(ax)
 
     for algorithm_name, histories in histories_by_algorithm.items():
-        arr = np.array(histories)           # shape (n_runs, n_iters)
+        arr = np.array(histories)
         mean = arr.mean(axis=0)
         std = arr.std(axis=0)
         iters = np.arange(arr.shape[1])
-        color = COLORS.get(algorithm_name, "grey")
+        color = COLORS.get(algorithm_name, "#64748B")
         ls = LINESTYLES.get(algorithm_name, "-")
 
-        ax.plot(iters, mean, label=algorithm_name, color=color, linestyle=ls, linewidth=1.8)
-        ax.fill_between(iters, mean - std, mean + std, color=color, alpha=0.15)
+        ax.plot(iters, mean, label=algorithm_name, color=color, linestyle=ls, linewidth=2.2)
+        ax.fill_between(iters, mean - std, mean + std, color=color, alpha=0.10)
 
-    # Detect maximisation from history direction (first algorithm, first vs last value)
     first_history = next(iter(histories_by_algorithm.values()))[0]
     is_maximize = len(first_history) > 1 and first_history[-1] > first_history[0]
     direction = "higher = better" if is_maximize else "lower = better"
-    ax.set_xlabel("Iteration", fontsize=11)
-    ax.set_ylabel(f"Best fitness  (mean ± 1 std,  {direction})", fontsize=11)
+    
+    ax.set_xlabel("Iteration", fontsize=10, fontweight="bold", color="#1E293B", labelpad=8)
+    ax.set_ylabel(f"Best Fitness (mean ± 1 std, {direction})", fontsize=10, fontweight="bold", color="#1E293B", labelpad=8)
+    
     n_runs = len(next(iter(histories_by_algorithm.values())))
-    ax.set_title(f"{benchmark_name}  —  {n_runs} independent runs", fontsize=12, fontweight="bold")
-    ax.legend(fontsize=10)
-    ax.grid(True, alpha=0.3, linestyle=":")
-    ax.set_yscale("symlog", linthresh=1e-2)
+    ax.set_title(f"{benchmark_name} — Benchmark Performance over {n_runs} Independent Runs", fontsize=12, fontweight="bold", color="#0F172A", pad=14, loc="left")
+    
+    # --- FIXED Y-AXIS SCALING LOGIC ---
+    if "knapsack" in benchmark_name.lower():
+        # Purely discrete problems don't need log scaling; use a clean linear scale
+        ax.set_yscale("linear")
+        # Automatically space ticks nicely based on data bounds
+        ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=6))
+    else:
+        # Mixed/Continuous problems use symlog, but with explicit log-spaced formatting
+        ax.set_yscale("symlog", linthresh=1e-1)
+        # Force matplotlib to display standard base-10 log ticks
+        ax.yaxis.set_major_locator(ticker.LogLocator(base=10.0, subs=(1.0,)))
+        ax.yaxis.set_major_formatter(ticker.LogFormatterMathtext())
+    
+    ax.legend(frameon=True, facecolor="#F8FAFC", edgecolor="none", fontsize=9, loc="upper right")
+    
     fig.tight_layout()
     save_or_show(fig, output_path)
 
 
-
-
-
-
-
-
-
-
-
-# Heatmap-style table summary across all benchmarks and algorithms
 def plot_summary_table(
-    table: dict[str, dict[str, float]], # {benchmark_name: {algorithm_name: mean_best_fitness}}
-    maximize_flags: dict[str, bool] | None = None, # {benchmark_name: is_maximize(True/False)}
-    title: str = "Final best fitness", # plot title
+    table: dict[str, dict[str, float]],
+    maximize_flags: dict[str, bool] | None = None,
+    title: str = "Final Best Fitness Matrix",
     output_path: Path | None = None 
 ) -> None:
-    """
-        Heatmap-style table with rows representing benchmarks and columns representing algorithms.
-        Each cell value represents the mean best fitness across runs.
-        Green = best per row
-    """
-
+    """Generates an elegant, modern heatmap table matrix."""
     benchmarks = list(table.keys())
     algorithms = list(next(iter(table.values())).keys())
-    maximize_flags = maximize_flags or {b: False for b in benchmarks} # default to minimization if maximize_flags is not provided so it is None
+    maximize_flags = maximize_flags or {b: False for b in benchmarks}
 
-    data = np.array([[table[b][a] for a in algorithms] for b in benchmarks]) # shape (n_benchmarks, n_algorithms)
+    data = np.array([[table[b][a] for a in algorithms] for b in benchmarks])
 
-    # Building a normalized score matrix for coloring: 1.0 = best, 0.0 = worst (per row)
     score = np.zeros_like(data)
     for i, bname in enumerate(benchmarks):
         row = data[i]
@@ -164,64 +152,77 @@ def plot_summary_table(
         if rmax == rmin:
             score[i] = 1.0
         elif maximize_flags.get(bname, False):
-            score[i] = (row - rmin) / (rmax - rmin)        # higher = greener
+            score[i] = (row - rmin) / (rmax - rmin)
         else:
-            score[i] = 1.0 - (row - rmin) / (rmax - rmin)  # lower = greener
+            score[i] = 1.0 - (row - rmin) / (rmax - rmin)
 
     n_bench = len(benchmarks)
-    fig_h   = max(3.0, n_bench * 1.1 + 1.0)
-    fig, ax = plt.subplots(figsize=(8, fig_h))
-    im = ax.imshow(score, cmap="RdYlGn", aspect="auto", vmin=0, vmax=1)
+    fig_h = max(3.5, n_bench * 1.0 + 1.2)
+    fig, ax = plt.subplots(figsize=(9, fig_h), facecolor="white")
+    
+    # Substituted "RdYlGn" for a sleek, modern, color-blind friendly "YlGnBu" or smooth sequential map
+    # "PiYG" or "RdYlGn" can look harsh; we use an updated smooth map or mask text values cleanly
+    im = ax.imshow(score, cmap="Greens", aspect="auto", vmin=0, vmax=1, alpha=0.85)
+
+    # Clean borders out of heatmap grid
+    for spine in ax.spines.values():
+        spine.set_visible(False)
 
     ax.set_xticks(range(len(algorithms)))
-    ax.set_xticklabels(algorithms, fontsize=10)
+    ax.set_xticklabels(algorithms, fontsize=10, fontweight="bold", color="#334155")
+    ax.xaxis.tick_top()  # Put headers at top like a true matrix table
+    
     ax.set_yticks(range(n_bench))
+    ylabels = [bname + (" ↑max" if maximize_flags.get(bname, False) else " ↓min") for bname in benchmarks]
+    ax.set_yticklabels(ylabels, fontsize=10, fontweight="bold", color="#334155")
 
-    # Add (max) / (min) label to benchmark name so it is self-explanatory
-    ylabels = []
-    for bname in benchmarks:
-        tag = " ↑max" if maximize_flags.get(bname, False) else " ↓min"
-        ylabels.append(bname + tag)
-    ax.set_yticklabels(ylabels, fontsize=9)
-
+    # Dynamic contrast text adjustments (Dark text on light background, light text on dark)
     for i, bname in enumerate(benchmarks):
         for j in range(len(algorithms)):
             val = data[i, j]
             text = f"{val:.3f}" if abs(val) < 100 else f"{val:.1f}"
-            ax.text(j, i, text, ha="center", va="center", fontsize=9, color="black", fontweight="bold")
-    ax.set_title(title + "  (green = best per row)", fontsize=11, fontweight="bold", pad=12)
-    fig.colorbar(im, ax=ax, shrink=0.8, label="Relative quality (1=best)")
+            
+            # Choose text color based on cell's performance rating background
+            cell_color = "white" if score[i, j] > 0.75 else "#1E293B"
+            ax.text(j, i, text, ha="center", va="center", fontsize=10, color=cell_color, fontweight="bold")
+            
+    ax.set_title(title, fontsize=12, fontweight="bold", color="#0F172A", pad=24, loc="center")
+    
+    # Custom stylized colorbar
+    cbar = fig.colorbar(im, ax=ax, shrink=0.7, aspect=15, pad=0.04)
+    cbar.outline.set_visible(False)
+    cbar.ax.tick_params(colors="#475569", labelsize=8)
+    cbar.set_label("Relative Performance Scale (1.0 = Best)", fontsize=9, color="#475569", labelpad=6)
+    
     fig.tight_layout()
     save_or_show(fig, output_path)
 
 
-
-
-
-
-
-
-
-
 def plot_ga_every_sweep(
-        sweep_results: dict[int, list[float]], # {ga_every_value: [best_fitness_run1, best_fitness_run2, ...]}
+        sweep_results: dict[int, list[float]],
         benchmark_name: str,
         output_path: Path | None = None
 ) -> None:
-    """
-        Plotting how the "ga_every" hyperparameter affects final solution quality.
-    """
-
+    """Plots hyperparameter effect using an elegant minimal line + shaded margin design."""
     ga_every_vals = sorted(sweep_results.keys())
     means = [np.mean(sweep_results[v]) for v in ga_every_vals]
     stds  = [np.std(sweep_results[v])  for v in ga_every_vals]
 
-    fig, ax = plt.subplots(figsize=(7, 4))
-    ax.errorbar(ga_every_vals, means, yerr=stds, fmt="o-", color=COLORS["Hybrid PSO-GA"], linewidth=2, markersize=7, capsize=5)
-    ax.set_xlabel("ga_every  (GA update frequency: 1=every iter, 10=rarely)", fontsize=10)
-    ax.set_ylabel("Mean best fitness (lower = better)", fontsize=10)
-    ax.set_title(f"Effect of GA update frequency on {benchmark_name}", fontsize=11, fontweight="bold")
+    fig, ax = plt.subplots(figsize=(7.5, 4), facecolor="white")
+    ax.set_facecolor("white")
+    apply_modern_style(ax)
+    
+    main_color = COLORS["Hybrid PSO-GA"]
+    
+    # Swapped noisy errorbars with a gorgeous clean line plus smooth standard deviation shaded corridor
+    ax.plot(ga_every_vals, means, color=main_color, marker="o", linewidth=2.5, markersize=6, label="Mean Best Fitness")
+    ax.fill_between(ga_every_vals, np.array(means) - np.array(stds), np.array(means) + np.array(stds), color=main_color, alpha=0.1)
+
+    ax.set_xlabel("GA Evaluation Window Intercept (ga_every Frequency)", fontsize=10, fontweight="bold", color="#1E293B", labelpad=8)
+    ax.set_ylabel("Mean Best Fitness (lower = better)", fontsize=10, fontweight="bold", color="#1E293B", labelpad=8)
+    ax.set_title(f"Sensitivity Analysis: ga_every frequency on {benchmark_name}", fontsize=11, fontweight="bold", color="#0F172A", pad=14, loc="left")
+    
     ax.set_xticks(ga_every_vals)
-    ax.grid(True, alpha=0.3, linestyle=":")
+    
     fig.tight_layout()
-    save_or_show(fig, output_path)   
+    save_or_show(fig, output_path)

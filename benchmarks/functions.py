@@ -11,11 +11,11 @@ import numpy as np
 
 # CONTINUOUS BENCHMARK - Ackley function
 
-"""
-EASY VERSION OF ACKLEY FUNCTION 
+
+#EASY VERSION OF ACKLEY FUNCTION 
 
 class Ackley:
-    
+    """
     Classic Ackley function - purely continuous, no discrete components.
 
     Highly multimodal: one global optimum at the origin surrounded by
@@ -25,7 +25,7 @@ class Ackley:
 
     Easy version
     Optimum: x=[0, 0, 0], f(x)=0    
-    
+    """
 
     name = "Ackley"
     problem_type = "continuous"
@@ -44,7 +44,7 @@ class Ackley:
         return(
             -a * np.exp(-b * np.sqrt(s1 / n)) - np.exp(s2 / n) + a + np.e
         )
-"""
+
 
 class HardAckley:
     """
@@ -79,18 +79,18 @@ class HardAckley:
 
 # DISCRETE BENCHMARK - 0/1 Knapsack problem
 
-"""
-EASY VERSION OF KNAPSACK PROBLEM
+
+#EASY VERSION OF KNAPSACK PROBLEM
 
 class Knapsack:
-    
+    """
     Classic 0/1 Knapsack problem - purely discrete, no continuous components.
 
     Select a subset of items to maximise total value without
     exceeding the weight capacity. Every decision is binary.
 
     Approximate optimum: select items 1, 2, 4, 5, 7 for a total value of 18.8
-
+    """
     
 
     WEIGHTS       = np.array([0.4, 0.3, 0.6, 0.2, 0.5, 0.7, 0.1, 0.8])
@@ -113,7 +113,7 @@ class Knapsack:
             return -1000.0 - (total_weight - self.CAPACITY) * 200.0 # Heavy penalty for exceeding capacity
         return total_value
    
-"""
+
 
 class HardKnapsack:
     """
