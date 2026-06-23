@@ -30,6 +30,30 @@ class MultiRunSummary:
     best_x_disc: np.ndarray | None = None
 
 
+# Best hyperparameters from experiments.tuner.py
+# (random search, 30 trials, 3 seeds, hard benchmarks).
+# These override the defaults in core/pso_ga.py when use_tuned=True.
+TUNED_CONFIGS = {
+    "Hybrid PSO-GA": {
+        "w": 0.5,
+        "c1": 2.0,
+        "c2": 1.6,
+        "p_cross": 0.7,
+        "p_mut": 0.07,
+        "ga_every": 3,
+    },
+    "Pure PSO": {
+        "w": 0.6,
+        "c1": 1.8,
+        "c2": 1.4,
+    },
+    "Pure GA": {
+        "p_cross": 0.7,
+        "p_mut": 0.05,
+    },
+}
+
+
 
 
 def run_all_algorithms(
@@ -45,6 +69,7 @@ def run_all_algorithms(
     p_cross: float = 0.7,
     p_mut: float = 0.1,
     verbose: bool = True,
+    use_tuned: bool = False
 ) -> dict[str, MultiRunSummary]:
     """
         Running Hybrid PSO-GA, Pure PSO and Pure GA on one benchmark for n_runs independent runs each 
@@ -64,20 +89,30 @@ def run_all_algorithms(
     fitness_fn = benchmark.fitness
     maximize = getattr(benchmark, "maximize", False)
 
+    # If use_tuned is set, override the per-algorithm defaults with
+    # the best configs found by experiments.tuner.py.
+    hybrid_kwargs = dict(
+        ga_every=ga_every, w=w, c1=c1, c2=c2,
+        p_cross=p_cross, p_mut=p_mut,
+    )
+    pso_kwargs = dict(w=w, c1=c1, c2=c2)
+    ga_kwargs = dict(p_cross=p_cross, p_mut=p_mut)
+
+    if use_tuned:
+        hybrid_kwargs.update(TUNED_CONFIGS["Hybrid PSO-GA"])
+        pso_kwargs.update(TUNED_CONFIGS["Pure PSO"])
+        ga_kwargs.update(TUNED_CONFIGS["Pure GA"])
+
     configs = [
         ("Hybrid PSO-GA",
          lambda: run_hybrid(fitness_fn, **shared,
-                            ga_every=ga_every, w=w, c1=c1, c2=c2,
-                            p_cross=p_cross, p_mut=p_mut,
-                            maximize=maximize)),
+                            maximize=maximize, **hybrid_kwargs)),
         ("Pure PSO",
          lambda: run_pure_pso(fitness_fn, **shared,
-                              w=w, c1=c1, c2=c2,
-                              maximize=maximize)),
+                              maximize=maximize, **pso_kwargs)),
         ("Pure GA",
          lambda: run_pure_ga(fitness_fn, **shared,
-                             p_cross=p_cross, p_mut=p_mut,
-                             maximize=maximize)),
+                             maximize=maximize, **ga_kwargs)),
     ]
 
     summaries: dict[str, MultiRunSummary] = {}
@@ -123,56 +158,6 @@ def run_all_algorithms(
                   f"({s.mean_time_sec:.1f}s/run)")
 
     return summaries
-
-
-
-
-
-# TAKE A LOOK ALSO AT THIS FUNCTION!! AGAIN!!!
-"""
-def sweep_ga_every(
-    benchmark,
-    ga_every_values: list[int],
-    # *,
-    n_runs: int = 10,
-    n_particles: int = 30,
-    max_iters: int = 200,
-    verbose: bool = True,
-) -> dict[int, list[float]]:
-    
-    Run the Hybrid PSO-GA for each value of ga_every and collect best-fitness
-    distributions.  Used to produce the sensitivity plot.
-
-    Returns {ga_every: [best_fit_run1, best_fit_run2, ...]}
-    
-    results: dict[int, list[float]] = {}
-    fitness_fn = benchmark.fitness
-
-    for gae in ga_every_values:
-        if verbose:
-            print(f"  ga_every={gae:2d} …", end="", flush=True)
-        bests = []
-        for _ in range(n_runs):
-            r = run_hybrid(
-                fitness_fn,
-                n_continuous=benchmark.n_continuous,
-                discrete_options=benchmark.discrete_options,
-                cont_lb=benchmark.cont_lb,
-                cont_ub=benchmark.cont_ub,
-                n_particles=n_particles,
-                max_iters=max_iters,
-                ga_every=gae,
-            )
-            bests.append(r.best_fitness)
-        results[gae] = bests
-        if verbose:
-            print(f"  mean={np.mean(bests):.4f}")
-
-    return results
-"""
-
-
-
 
 
 
@@ -280,7 +265,7 @@ def print_best_solutions(all_summaries: dict[str, dict[str, MultiRunSummary]],
 def save_results_txt(
     all_summaries: dict[str, dict[str, MultiRunSummary]],
     benchmarks_list: list,
-    path: str = "resultsEasy/results.txt",
+    path: str = "resultsTuned/results.txt",
 ) -> None:
     """
     Save the full results — fitness table + best solution vectors — to a
@@ -372,3 +357,43 @@ def save_results_txt(
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(buf.getvalue(), encoding="utf-8")
     print(f"  Saved → {out}")
+
+
+
+
+
+if __name__ == "__main__":
+    import argparse
+    from benchmarks import BENCHMARKS as _BENCH
+
+    parser = argparse.ArgumentParser(
+        description="Run all algorithms on all benchmarks."
+    )
+    parser.add_argument(
+        "--use_tuned", action="store_true",
+        help="Use the tuned hyperparameters from TUNED_CONFIGS."
+    )
+    parser.add_argument(
+        "--n_runs", type=int, default=10,
+        help="Number of independent runs per (algo, benchmark) pair."
+    )
+    parser.add_argument(
+        "--out", default="resultsTuned",
+        help="Output folder for the .txt results file."
+    )
+    args = parser.parse_args()
+
+    all_summaries: dict[str, dict[str, MultiRunSummary]] = {}
+    for benchmark in _BENCH:
+        all_summaries[benchmark.name] = run_all_algorithms(
+            benchmark,
+            n_runs=args.n_runs,
+            use_tuned=args.use_tuned,
+        )
+
+    print_results_table(all_summaries)
+    print_best_solutions(all_summaries, list(_BENCH))
+
+    suffix = "_tuned" if args.use_tuned else "_default"
+    out_path = f"{args.out}/results{suffix}.txt"
+    save_results_txt(all_summaries, list(_BENCH), path=out_path)    

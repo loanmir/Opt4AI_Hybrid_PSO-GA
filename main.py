@@ -45,6 +45,8 @@ def parse_args():
     #p.add_argument("--hard-only", action="store_true", help="Run only the hard benchmarks")
     #p.add_argument("--sweep",     action="store_true", help="Run ga_every sensitivity sweep on Hard Ackley")
     p.add_argument("--no-save",   action="store_true", help="Show plots interactively instead of saving to disk")
+    p.add_argument("--use_tuned", action="store_true",
+                   help="Use tuned hyperparameters from TUNED_CONFIGS (in experiments/runner.py).")
     return p.parse_args()
 
 
@@ -56,7 +58,7 @@ def main():
 
     n_runs    = 3   if args.quick else 10
     max_iters = 100 if args.quick else 200
-    base_dir  = None if args.no_save else Path("resultsEasy")
+    base_dir  = None if args.no_save else Path("resultsTunedHard" if args.use_tuned else "resultsEasy")
 
     # Decide which suites to run
     if base_dir:
@@ -77,6 +79,7 @@ def main():
             n_runs=n_runs,
             max_iters=max_iters,
             verbose=True,
+            use_tuned=args.use_tuned,
         )
         all_summaries[bench.name] = summaries
 
