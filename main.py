@@ -25,7 +25,6 @@ from pathlib import Path # for handling file paths
 from benchmarks import BENCHMARKS # Importing benchmark problems
 from experiments.runner import (
     run_all_algorithms,
-    #sweep_ga_every,
     print_results_table,
     print_best_solutions,
     save_results_txt
@@ -33,7 +32,6 @@ from experiments.runner import (
 from experiments.plotting import (
     plot_multi_run_convergence,
     plot_summary_table,
-    #plot_ga_every_sweep
 )
 
 
@@ -50,54 +48,6 @@ def parse_args():
     return p.parse_args()
 
 
-
-
-
-"""
-# Running all three algorithms on a list of benchmarks and save the results.
-def run_suite(benchmarks, label, n_runs, max_iters, out_dir):
-    all_summaries = {}
-
-    for bench in benchmarks:
-        print(f"  Benchmark: {bench.name}")
-        summaries = run_all_algorithms(
-            bench,
-            n_runs=n_runs,
-            max_iters=max_iters,
-            verbose=True,
-        )
-        all_summaries[bench.name] = summaries
-
-        # Convergence plot
-        histories_by_algorithm = {
-            algorithm: s.histories for algorithm, s in summaries.items()
-        }
-        fname = bench.name.lower().replace(" ", "_").replace("(", "").replace(")", "")
-        save_path = out_dir / f"convergence_{fname}.png" if out_dir else None
-        plot_multi_run_convergence(histories_by_algorithm, bench.name, output_path=save_path)
-        print()
-
-    # Summary heatmap
-    table = {
-        bname: {aname: s.mean_best for aname, s in algorithms.items()}
-        for bname, algorithms in all_summaries.items()
-    }
-    print_results_table(all_summaries)
-    print_best_solutions(all_summaries, benchmarks)
-    plot_summary_table(
-        table,
-        maximize_flags={b.name: getattr(b, "maximize", False) for b in benchmarks},
-        title=f"Final best fitness — {label} benchmarks",
-        output_path=out_dir / "summary_table.png" if out_dir else None,
-    )
-
-    # Save text results
-    if out_dir:
-        save_results_txt(all_summaries, benchmarks, path=str(out_dir / "results.txt"))
-
-    return all_summaries
-
-"""
 
 
 
