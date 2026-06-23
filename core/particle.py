@@ -87,6 +87,7 @@ class GlobalBest:
         Class that tracks the global best solution across the whole swarm.
         Internally it minimizes, the raw fitness values are negated on entry so the same
         "lower is better" logic can be applied everywhere in the algorithm.
+        Having one single comparison everywhere 
     """
 
     def __init__(self, maximize: bool = False):

@@ -87,14 +87,14 @@ def ga_update(
 
     # Uniform crossover
     if np.random.rand() < p_crossover:
-        mask = np.random.rand(n) < 0.5
+        mask = np.random.rand(n) < 0.5 #50/50 -> UNIFORM CROSSOVER
         child[mask] = partner.x_disc[mask]
 
     # Mutation
     for i in range(n):
         if np.random.rand() < p_mutation:
             # Randomly select a new value for this discrete dimension
-            child[i] = np.random.randint(0, particle.discrete_options[i])
+            child[i] = np.random.randint(0, particle.discrete_options[i]) # Noise injection
     
     # If nothing actually changed, there's nothing to evaluate or compare
     if np.array_equal(child, particle.x_disc):

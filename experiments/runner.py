@@ -129,7 +129,7 @@ def run_all_algorithms(
 
 
 # TAKE A LOOK ALSO AT THIS FUNCTION!! AGAIN!!!
-
+"""
 def sweep_ga_every(
     benchmark,
     ga_every_values: list[int],
@@ -139,12 +139,12 @@ def sweep_ga_every(
     max_iters: int = 200,
     verbose: bool = True,
 ) -> dict[int, list[float]]:
-    """
+    
     Run the Hybrid PSO-GA for each value of ga_every and collect best-fitness
     distributions.  Used to produce the sensitivity plot.
 
     Returns {ga_every: [best_fit_run1, best_fit_run2, ...]}
-    """
+    
     results: dict[int, list[float]] = {}
     fitness_fn = benchmark.fitness
 
@@ -169,7 +169,7 @@ def sweep_ga_every(
             print(f"  mean={np.mean(bests):.4f}")
 
     return results
-
+"""
 
 
 
@@ -275,7 +275,7 @@ def print_best_solutions(all_summaries: dict[str, dict[str, MultiRunSummary]],
 
 
 
-# TAKE AGAIN A LOOK AT THIS! --> Recall if this function is needed, Maybe just plots are needed?!?!?
+
 
 def save_results_txt(
     all_summaries: dict[str, dict[str, MultiRunSummary]],

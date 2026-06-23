@@ -11,7 +11,7 @@ All return an AlgorithmResult dataclass
 
 from __future__ import annotations
 import numpy as np
-from dataclasses import dataclass, field  # Python decorator to automatically generate special methods like __init__() and __repr__() for classes that primarily store data.
+from dataclasses import dataclass  # Python decorator to automatically generate special methods like __init__() and __repr__() for classes that primarily store data.
 from typing import Callable
 from core.particle import HybridParticle, GlobalBest
 from core.operators import pso_update, ga_update, tournament_selection
@@ -77,7 +77,7 @@ def run_hybrid(
         c2: float = 1.5,
         p_cross: float = 0.7,
         p_mut: float = 0.1,
-        ga_every: int = 1, # -> GA xover and mutation on discrete dims EVERY N ITERS
+        ga_every: int = 3, # -> GA xover and mutation on discrete dims EVERY N ITERS
         w_decay: bool = True, # -> INERTIA WEIGHT DECAY -> Discreases linearly the w value -> It balances exploration early and exploitation late in the run
         maximize: bool = False
 ) -> AlgorithmResult: 
@@ -239,6 +239,7 @@ def run_pure_pso(
 
 # Pure GA ----------------------------------------------------
 # (applies crossover + mutation to both continuous and discrete dims)
+# NOT STEADY-STATE !
 def run_pure_ga(
         fintess_fn: FitnessFn,
         n_continuous: int,

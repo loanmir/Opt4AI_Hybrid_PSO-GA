@@ -25,7 +25,7 @@ from pathlib import Path # for handling file paths
 from benchmarks import BENCHMARKS # Importing benchmark problems
 from experiments.runner import (
     run_all_algorithms,
-    sweep_ga_every,
+    #sweep_ga_every,
     print_results_table,
     print_best_solutions,
     save_results_txt
@@ -33,7 +33,7 @@ from experiments.runner import (
 from experiments.plotting import (
     plot_multi_run_convergence,
     plot_summary_table,
-    plot_ga_every_sweep
+    #plot_ga_every_sweep
 )
 
 
@@ -45,7 +45,7 @@ def parse_args():
     p.add_argument("--quick",     action="store_true", help="Fast mode: 3 runs, 100 iterations")
     #p.add_argument("--easy-only", action="store_true", help="Run only the easy benchmarks")
     #p.add_argument("--hard-only", action="store_true", help="Run only the hard benchmarks")
-    p.add_argument("--sweep",     action="store_true", help="Run ga_every sensitivity sweep on Hard Ackley")
+    #p.add_argument("--sweep",     action="store_true", help="Run ga_every sensitivity sweep on Hard Ackley")
     p.add_argument("--no-save",   action="store_true", help="Show plots interactively instead of saving to disk")
     return p.parse_args()
 
@@ -111,9 +111,6 @@ def main():
     # Decide which suites to run
     if base_dir:
         base_dir.mkdir(parents=True, exist_ok=True)
-
-    mode = "quick" if args.quick else "full"
-
     mode = "quick" if args.quick else "full"
     print(f"\n{'='*62}")
     print(f"Hybrid PSO-GA  —  {mode} experiment")
