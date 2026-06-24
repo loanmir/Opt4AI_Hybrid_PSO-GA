@@ -12,7 +12,7 @@ from core.pso_ga import (
     run_hybrid, run_pure_pso, run_pure_ga, AlgorithmResult
 )
 
-from benchmarks import BENCHMARKS
+from benchmarks import EASY_BENCHMARKS, HARD_BENCHMARKS
 
 
 @dataclass
