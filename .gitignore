@@ -2,8 +2,9 @@
 results/
 resultsHard/
 resultsEasy/
-resultsTunedEasy/
-resultsTunedHard/
+resultsEasyTuned/
+resultsHard/
+resultsHardTuned/
 
 # Python cache files — never commit these
 __pycache__/
