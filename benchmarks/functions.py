@@ -63,7 +63,7 @@ class HardAckley:
     discrete_options = [] # No discrete dimensions
     cont_lb      = np.array([-32.768] * 10) # 10 dimensions, each in [-32.768, 32.768]
     cont_ub      = np.array([32.768] * 10)
-    #optimum      = 0.0 -> The optimum is at the origin, but we don't need to store it explicitly since it's known. -> LATER IMPLEMENT GAP BETWEEN BEST FOUND AND OPTIMUM 
+    #optimum      = 0.0 -> The optimum is at the origin, but we don't need to store it explicitly since it's known.  
 
     def fitness(self, x_cont: np.ndarray, x_disc: np.ndarray) -> float:
         a, b, c = 20.0, 0.2, 2 * np.pi
@@ -139,7 +139,7 @@ class HardKnapsack:
     discrete_options = [2] * len(WEIGHTS) # Binary decisions for each item
     cont_lb = np.array([]) # No continuous dimensions
     cont_ub = np.array([]) # No continuous dimensions
-    #optimum = 81.20  -> variable not used at the moment -> LATER IMPLEMENT GAP BETWEEN BEST FOUND AND OPTIMUM 
+
 
     def fitness(self, x_cont: np.ndarray, x_disc: np.ndarray) -> float:
         total_weight = float(np.dot(x_disc, self.WEIGHTS))
@@ -241,7 +241,7 @@ class HardNAS:
     discrete_options = [6, 5, 3, 2, 3] 
     cont_lb      = np.array([1e-5, 0.0,  1e-6, 3.0])
     cont_ub      = np.array([0.1,  0.5,  1e-2, 8.0])
-    #optimum      = 0.0     ->    variable not used at the moment -> LATER IMPLEMENT GAP BETWEEN BEST FOUND AND OPTIMUM 
+    
 
 
     OPT_LR = 0.001
@@ -257,7 +257,7 @@ class HardNAS:
         lr, dropout, wd, bs_log = (float(v) for v in x_cont)
         n_layers_idx, act_idx, opt_idx, skip, norm_idx = (int(v) for v in x_disc)
 
-        # --- Continuous cost ---
+        # Continuous cost
         cont_cost = (
             abs(lr      - self.OPT_LR) * 500.0
             + abs(dropout - self.OPT_DO) * 2.0
@@ -265,7 +265,7 @@ class HardNAS:
             + abs(bs_log  - self.OPT_BS) * 0.3
         )
 
-        # --- Discrete cost ---
+        # Discrete cost
         disc_cost = (
             abs(n_layers_idx - 2) * 0.8     # 3 layers = index 2
             + self.ACT_PEN[act_idx]
@@ -273,14 +273,14 @@ class HardNAS:
             + self.NORM_PEN[norm_idx]
         )
 
-        # --- Cross-type interaction: skip + batchnorm bonus ---
+        # Cross-type interaction: skip + batchnorm bonus ---
         # Awarded only when BOTH discrete choices are correct.
         # This reward can only be fully exploited when the continuous
         # params are also near-optimal — this is the cross-type
         # interaction that makes NAS genuinely mixed.
         interaction_bonus = 0.3 if (skip == 1 and norm_idx == 1) else 0.0
 
-        # --- Continuous x discrete penalty: SGD + high lr is unstable ---
+        # Continuous x discrete penalty: SGD + high lr is unstable 
         sgd_lr_penalty = 0.5 if (opt_idx == 1 and lr > 0.01) else 0.0
 
         return cont_cost + disc_cost + sgd_lr_penalty - interaction_bonus

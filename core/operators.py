@@ -100,7 +100,7 @@ def ga_update(
     if np.array_equal(child, particle.x_disc):
         return
 
-    # --- Greedy acceptance check ---
+    # Greedy acceptance check 
     candidate_fit = fitness_fn(particle.x_cont, child)
     is_better_or_equal = (
         candidate_fit >= particle.fitness if maximize

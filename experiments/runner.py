@@ -275,7 +275,7 @@ def save_results_txt(
 
     buf = io.StringIO()
 
-    # --- Header ---
+    # Header
     buf.write("=" * 70 + "\n")
     buf.write("  HYBRID PSO-GA  —  EXPERIMENT RESULTS\n")
     buf.write("=" * 70 + "\n\n")
@@ -283,7 +283,7 @@ def save_results_txt(
     benchmarks = list(all_summaries.keys())
     algorithms      = list(next(iter(all_summaries.values())).keys())
 
-    # --- Summary table ---
+    # Summary table
     buf.write("SUMMARY TABLE  (mean best fitness ± std across runs)\n")
     buf.write("  Minimisation benchmarks (Ackley, NAS): lower = better\n")
     buf.write("  Maximisation benchmark  (Knapsack):    higher = better\n\n")
@@ -303,7 +303,7 @@ def save_results_txt(
 
     buf.write("=" * len(header) + "\n\n")
 
-    # --- Best solution details ---
+    # Best solution details
     buf.write("BEST SOLUTION DETAILS  (from the single best run)\n")
     bench_meta = {b.name: b for b in benchmarks_list}
 
@@ -356,7 +356,7 @@ def save_results_txt(
     out = Path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(buf.getvalue(), encoding="utf-8")
-    print(f"  Saved → {out}")
+    print(f"  Saved at{out}")
 
 
 

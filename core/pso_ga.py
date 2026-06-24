@@ -115,7 +115,6 @@ def run_hybrid(
             pso_update(particle, global_best.x_cont, w_current, c1, c2)
 
             # Fitness evaluation
-            # Fix: Evaluation of fitness immediately after the PSO step, so that GA has an accurate baseline to compare.
             # If evaluation is done after GA, it might be comparing against an outdated fitness value, leading to incorrect acceptance/rejection of new solutions.
             particle.fitness = fitner_fn(particle.x_cont, particle.x_disc)     # -> Doing a double fitness evaluation 
             n_evals += 1

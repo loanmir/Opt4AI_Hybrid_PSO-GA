@@ -10,7 +10,7 @@ Usage:
 from __future__ import annotations
 import argparse
 import numpy as np
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Callable
 
 from benchmarks.functions import Ackley, HardAckley, Knapsack, HardKnapsack, NAS, HardNAS

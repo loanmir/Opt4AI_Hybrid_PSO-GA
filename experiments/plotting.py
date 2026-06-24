@@ -39,6 +39,9 @@ def apply_modern_style(ax: plt.Axes) -> None:
     ax.grid(True, alpha=0.2, linestyle="-", color="#94A3B8")
 
 
+
+
+
 def save_or_show(fig: plt.Figure, path: Path | None) -> None:
     if path is not None:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -48,6 +51,10 @@ def save_or_show(fig: plt.Figure, path: Path | None) -> None:
         plt.tight_layout()
         plt.show()
     plt.close(fig)
+
+
+
+
 
 
 def plot_convergence(
@@ -79,6 +86,9 @@ def plot_convergence(
     
     fig.tight_layout()
     save_or_show(fig, output_path)
+
+
+
 
 
 def plot_multi_run_convergence(
@@ -113,7 +123,7 @@ def plot_multi_run_convergence(
     n_runs = len(next(iter(histories_by_algorithm.values())))
     ax.set_title(f"{benchmark_name} — Benchmark Performance over {n_runs} Independent Runs", fontsize=12, fontweight="bold", color="#0F172A", pad=14, loc="left")
     
-    # --- FIXED Y-AXIS SCALING LOGIC ---
+    # FIXED Y-AXIS SCALING LOGIC 
     if "knapsack" in benchmark_name.lower():
         # Purely discrete problems don't need log scaling; use a clean linear scale
         ax.set_yscale("linear")
@@ -130,6 +140,10 @@ def plot_multi_run_convergence(
     
     fig.tight_layout()
     save_or_show(fig, output_path)
+
+
+
+
 
 
 def plot_summary_table(
@@ -160,8 +174,7 @@ def plot_summary_table(
     fig_h = max(3.5, n_bench * 1.0 + 1.2)
     fig, ax = plt.subplots(figsize=(9, fig_h), facecolor="white")
     
-    # Substituted "RdYlGn" for a sleek, modern, color-blind friendly "YlGnBu" or smooth sequential map
-    # "PiYG" or "RdYlGn" can look harsh; we use an updated smooth map or mask text values cleanly
+    
     im = ax.imshow(score, cmap="Greens", aspect="auto", vmin=0, vmax=1, alpha=0.85)
 
     # Clean borders out of heatmap grid
@@ -197,32 +210,3 @@ def plot_summary_table(
     fig.tight_layout()
     save_or_show(fig, output_path)
 
-
-def plot_ga_every_sweep(
-        sweep_results: dict[int, list[float]],
-        benchmark_name: str,
-        output_path: Path | None = None
-) -> None:
-    """Plots hyperparameter effect using an elegant minimal line + shaded margin design."""
-    ga_every_vals = sorted(sweep_results.keys())
-    means = [np.mean(sweep_results[v]) for v in ga_every_vals]
-    stds  = [np.std(sweep_results[v])  for v in ga_every_vals]
-
-    fig, ax = plt.subplots(figsize=(7.5, 4), facecolor="white")
-    ax.set_facecolor("white")
-    apply_modern_style(ax)
-    
-    main_color = COLORS["Hybrid PSO-GA"]
-    
-    # Swapped noisy errorbars with a gorgeous clean line plus smooth standard deviation shaded corridor
-    ax.plot(ga_every_vals, means, color=main_color, marker="o", linewidth=2.5, markersize=6, label="Mean Best Fitness")
-    ax.fill_between(ga_every_vals, np.array(means) - np.array(stds), np.array(means) + np.array(stds), color=main_color, alpha=0.1)
-
-    ax.set_xlabel("GA Evaluation Window Intercept (ga_every Frequency)", fontsize=10, fontweight="bold", color="#1E293B", labelpad=8)
-    ax.set_ylabel("Mean Best Fitness (lower = better)", fontsize=10, fontweight="bold", color="#1E293B", labelpad=8)
-    ax.set_title(f"Sensitivity Analysis: ga_every frequency on {benchmark_name}", fontsize=11, fontweight="bold", color="#0F172A", pad=14, loc="left")
-    
-    ax.set_xticks(ga_every_vals)
-    
-    fig.tight_layout()
-    save_or_show(fig, output_path)
