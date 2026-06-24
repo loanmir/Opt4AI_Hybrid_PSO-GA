@@ -1,10 +1,9 @@
 .venv/
 results/
-resultsHard/
-resultsEasy/
-resultsEasyTuned/
-resultsHard/
-resultsHardTuned/
+#resultsHard/
+#resultsEasy/
+#resultsEasyTuned/
+#resultsHardTuned/
 
 # Python cache files — never commit these
 __pycache__/

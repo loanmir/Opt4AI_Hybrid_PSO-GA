@@ -1,0 +1,85 @@
+======================================================================
+  HYBRID PSO-GA  —  EXPERIMENT RESULTS
+======================================================================
+
+SUMMARY TABLE  (mean best fitness ± std across runs)
+  Minimisation benchmarks (Ackley, NAS): lower = better
+  Maximisation benchmark  (Knapsack):    higher = better
+
+==========================================================================================================
+Benchmark                            Hybrid PSO-GA                    Pure PSO                     Pure GA
+==========================================================================================================
+Ackley                   0.000000 ± 0.000000    0.000000 ± 0.000000    0.401428 ± 0.259737 
+Knapsack                12.890000 ± 0.211896   12.630000 ± 0.334813   12.980000 ± 0.060000 
+NAS                      0.000000 ± 0.000000    0.000000 ± 0.000000    0.014461 ± 0.010798 
+==========================================================================================================
+
+BEST SOLUTION DETAILS  (from the single best run)
+
+────────────────────────────────────────────────────────────
+  Ackley   (lower = better)
+────────────────────────────────────────────────────────────
+
+  [Hybrid PSO-GA]
+    Fitness     mean=0.000000std=0.000000  best=0.000000
+    x_cont    [-0.000000  0.000000  -0.000000]
+    x_disc    []
+
+  [Pure PSO]
+    Fitness     mean=0.000000std=0.000000  best=0.000000
+    x_cont    [-0.000000  -0.000000  0.000000]
+    x_disc    []
+
+  [Pure GA]
+    Fitness     mean=0.401428std=0.259737  best=0.006699
+    x_cont    [-0.001219  -0.000068  -0.002563]
+    x_disc    []
+
+────────────────────────────────────────────────────────────
+  Knapsack   (higher = better)
+────────────────────────────────────────────────────────────
+
+  [Hybrid PSO-GA]
+    Fitness     mean=12.890000std=0.211896  best=13.000000
+    x_cont    []
+    x_disc    [0  0  0  0  0  1  0  1]
+ Items selected: [5, 7]
+ Total value:    13.00  (weight: 1.50 / capacity: 1.50)
+
+  [Pure PSO]
+    Fitness     mean=12.630000std=0.334813  best=13.000000
+    x_cont    []
+    x_disc    [0  0  0  0  0  1  0  1]
+ Items selected: [5, 7]
+ Total value:    13.00  (weight: 1.50 / capacity: 1.50)
+
+  [Pure GA]
+    Fitness     mean=12.980000std=0.060000  best=13.000000
+    x_cont    []
+    x_disc    [0  0  0  0  0  1  0  1]
+ Items selected: [5, 7]
+ Total value:    13.00  (weight: 1.50 / capacity: 1.50)
+
+────────────────────────────────────────────────────────────
+  NAS   (lower = better)
+────────────────────────────────────────────────────────────
+
+  [Hybrid PSO-GA]
+    Fitness     mean=0.000000std=0.000000  best=0.000000
+    x_cont    [0.010000  0.100000]
+    x_disc    [1  0]
+ Architecture:   lr=0.010000  dropout=0.1000  layers=2  activation=relu
+
+  [Pure PSO]
+    Fitness     mean=0.000000std=0.000000  best=0.000000
+    x_cont    [0.010000  0.100000]
+    x_disc    [1  0]
+ Architecture:   lr=0.010000  dropout=0.1000  layers=2  activation=relu
+
+  [Pure GA]
+    Fitness     mean=0.014461std=0.010798  best=0.003051
+    x_cont    [0.010038  0.099957]
+    x_disc    [1  0]
+ Architecture:   lr=0.010038  dropout=0.1000  layers=2  activation=relu
+
+======================================================================
