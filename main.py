@@ -1,28 +1,37 @@
 """
-Entry point for the Hybrid PSO-GA project 
+Entry point for the Hybrid PSO-GA project.
 
 Usage
--------
+-----
 
-    python main.py              Full experiment: 10 runs, 200 iterations
-    python main.py --quick      Quick experiment: 3 runs, 100 iterations
-    python main.py --no-save    Show plots interactively instead of saving to disk
-
+    python main.py                              Full Easy run with defaults (10 runs x 200 iters)
+    python main.py --quick                      Quick Easy run with defaults (3 runs x 100 iters)
+    python main.py --no-save                    Show plots interactively, don't save anything
+    python main.py --use_tuned                  Use tuned hyperparameters from TUNED_CONFIGS
+    python main.py --n_runs 30                  Override number of runs per (algo, benchmark)
+    python main.py --max_iters 500              Override iterations per run
 
 
 Output
--------
+------
 
+The output folder is chosen automatically based on --suite and --use_tuned:
 
-    The results of the optimization process will be saved in the 'resultsEasy/resultsHard' directory.
-    resultsEasy(resultsHard)/convergence_<benchmark_name>.png --> Convergence per benchmark
-    resultsEasy(resultsHard)/summary_table.png                --> Heatmap for each bechmark and algorithm combination
-    ...
+    python main.py --suite easy               ->  resultsEasy/
+    python main.py --suite easy  --use_tuned  ->  resultsEasyTuned/
+    python main.py --suite hard               ->  resultsHard/
+    python main.py --suite hard  --use_tuned  ->  resultsHardTuned/
+
+Each folder contains:
+
+    results.txt                              Summary table + best solutions
+    convergence_<benchmark>.png              One convergence plot per benchmark
+    summary_table.png                        Heatmap of (benchmark x algorithm) results
 """
 
 import argparse # for parsing command-line arguments
 from pathlib import Path # for handling file paths
-from benchmarks import BENCHMARKS # Importing benchmark problems
+from benchmarks import EASY_BENCHMARKS, HARD_BENCHMARKS # Importing benchmark problems
 from experiments.runner import (
     run_all_algorithms,
     print_results_table,
@@ -41,12 +50,11 @@ from experiments.plotting import (
 def parse_args():
     p = argparse.ArgumentParser(description="Hybrid PSO-GA experiment runner")
     p.add_argument("--quick",     action="store_true", help="Fast mode: 3 runs, 100 iterations")
-    #p.add_argument("--easy-only", action="store_true", help="Run only the easy benchmarks")
-    #p.add_argument("--hard-only", action="store_true", help="Run only the hard benchmarks")
-    #p.add_argument("--sweep",     action="store_true", help="Run ga_every sensitivity sweep on Hard Ackley")
     p.add_argument("--no-save",   action="store_true", help="Show plots interactively instead of saving to disk")
-    p.add_argument("--use_tuned", action="store_true",
-                   help="Use tuned hyperparameters from TUNED_CONFIGS (in experiments/runner.py).")
+    p.add_argument("--use_tuned", action="store_true", help="Use tuned hyperparameters from TUNED_CONFIGS (in experiments/runner.py).")
+    p.add_argument("--n_runs",    type=int, default=None, help="Number of runs per (algo, benchmark) pair. Overrides --quick default.")
+    p.add_argument("--max_iters", type=int, default=None, help="Iterations per run. Overrides --quick default.")
+    p.add_argument("--suite",     choices=["easy", "hard"], default="easy", help="Which benchmark suite to run: 'easy' (Ackley/Knapsack/NAS) or 'hard' (10-D/25-item/4D versions).")
     return p.parse_args()
 
 
@@ -56,9 +64,19 @@ def parse_args():
 def main():
     args = parse_args()
 
-    n_runs    = 3   if args.quick else 10
-    max_iters = 100 if args.quick else 200
-    base_dir  = None if args.no_save else Path("resultsTunedHard" if args.use_tuned else "resultsEasy")
+    # Pick the benchmark suite
+    benchmarks = EASY_BENCHMARKS if args.suite == "easy" else HARD_BENCHMARKS
+
+    #   resultsEasy / resultsEasyTuned / resultsHard / resultsHardTuned
+    if not args.no_save:
+        suffix = "Tuned" if args.use_tuned else ""
+        base_dir = Path(f"results{args.suite.capitalize()}{suffix}")
+    else:
+        base_dir = None
+
+    n_runs    = args.n_runs    if args.n_runs    is not None else (3   if args.quick else 10)
+    max_iters = args.max_iters if args.max_iters is not None else (100 if args.quick else 200)
+    #base_dir  = None if args.no_save else Path("resultsTunedHard" if args.use_tuned else "resultsHard")
 
     # Decide which suites to run
     if base_dir:
@@ -72,7 +90,7 @@ def main():
 
     all_summaries = {}
 
-    for bench in BENCHMARKS:
+    for bench in benchmarks:
         print(f"  Benchmark: {bench.name}")
         summaries = run_all_algorithms(
             bench,
@@ -98,16 +116,16 @@ def main():
         for bname, algos in all_summaries.items()
     }
     print_results_table(all_summaries)
-    print_best_solutions(all_summaries, BENCHMARKS)
+    print_best_solutions(all_summaries, benchmarks)
     plot_summary_table(
         table,
-        maximize_flags={b.name: getattr(b, "maximize", False) for b in BENCHMARKS},
+        maximize_flags={b.name: getattr(b, "maximize", False) for b in benchmarks},
         title="Final best fitness — all benchmarks",
         output_path=base_dir / "summary_table.png" if base_dir else None,
     )
 
     if base_dir:
-        save_results_txt(all_summaries, BENCHMARKS, path=str(base_dir / "results.txt"))
+        save_results_txt(all_summaries, benchmarks, path=str(base_dir / "results.txt"))
 
     if base_dir:
         print(f"\nDone. All plots and results saved to ./{base_dir}/")
